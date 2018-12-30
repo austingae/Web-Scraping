@@ -1,19 +1,26 @@
 from bs4 import BeautifulSoup
 import requests
+import csv
 
 source = requests.get("https://www.youtube.com/feed/trending").text
-# print(source)
-
 soup = BeautifulSoup(source, 'lxml')
 
-# print(soup.prettify())
+csv_file = open('YouTube Trending Titles on 12-30-18.csv','w')
+csv_writer = csv.writer(csv_file)
+csv_writer.writerow(['Title', 'Description'])
 
-section = soup.find('ol', class_ = "section-list")
-print(section.prettify())
+for content in soup.find_all('div', class_= "yt-lockup-content"):
+    try:
+        title = content.h3.a.text
+        print(title)
 
-# title = section.find('div', class_= "yt-lockup-content").h3.a.text
-# print(title)
+        description = content.find('div', class_="yt-lockup-description yt-ui-ellipsis yt-ui-ellipsis-2").text
+        print(description)
 
-# id="item-section-783571" class="item-section"
-# ol id="section-list-567838" class="section-list"
-# "yt-lockup-content"
+    except Exception as e:
+        description = None
+
+    print('\n')
+    csv_writer.writerow([title, description])
+
+csv_file.close()
